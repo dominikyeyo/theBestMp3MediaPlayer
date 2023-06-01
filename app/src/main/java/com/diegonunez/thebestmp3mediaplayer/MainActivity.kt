@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -43,8 +45,13 @@ import com.diegonunez.thebestmp3mediaplayer.ui.component.TopBar
 import com.diegonunez.thebestmp3mediaplayer.ui.component.Track
 import com.diegonunez.thebestmp3mediaplayer.ui.component.WarningMessage
 import com.diegonunez.thebestmp3mediaplayer.ui.theme.Black3
+import com.diegonunez.thebestmp3mediaplayer.ui.theme.PrimaryColor
+import com.diegonunez.thebestmp3mediaplayer.ui.theme.SecondaryColor
+import com.diegonunez.thebestmp3mediaplayer.ui.theme.TertiaryColor
+import com.diegonunez.thebestmp3mediaplayer.ui.theme.QuaternaryColor
 import com.diegonunez.thebestmp3mediaplayer.ui.theme.TheBestMp3MediaPlayerTheme
 import com.diegonunez.thebestmp3mediaplayer.ui.utils.FORWARD_BACKWARD_STEP
+import com.diegonunez.thebestmp3mediaplayer.util.audio.ConstantsPresentation.Text.FAVORITES
 import com.diegonunez.thebestmp3mediaplayer.util.isNotEmpty
 import com.diegonunez.thebestmp3mediaplayer.util.screenHeight
 import com.diegonunez.thebestmp3mediaplayer.util.setupPermissions
@@ -180,7 +187,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier
                                 .fillMaxSize()
                                 .verticalScroll(state = rememberScrollState())
-                                .background(color = MaterialTheme.colors.background),
+                                .background(color = PrimaryColor),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             TopBar(
@@ -201,24 +208,35 @@ class MainActivity : ComponentActivity() {
                                     )
                                 },
                                 title = {
-                                    if (state.selectedAudio.isNotEmpty()) {
-                                        val artist = if (state.selectedAudio.artist.contains(
-                                                "unknown",
-                                                ignoreCase = true
-                                            )
-                                        ) "" else "${state.selectedAudio.artist} - "
-                                        Text(
-                                            text = buildAnnotatedString {
-                                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                                                    append(text = artist)
+
+                                    ClickableText(
+                                        text = buildAnnotatedString {
+                                            withStyle(SpanStyle(fontWeight = FontWeight.Bold,color = QuaternaryColor)) {
+                                                append(text = FAVORITES)
+                                            }
+                                        },
+                                        overflow = TextOverflow.Visible,
+                                        style = MaterialTheme.typography.h5,
+                                        onClick = {
+                                            setupPermissions(
+                                                context = context,
+                                                permissions = arrayOf(
+                                                    Manifest.permission.RECORD_AUDIO,
+                                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                                ),
+                                                launcher = requestPermissionLauncher,
+                                                onPermissionsGranted = {
+                                                    scope.launch {
+                                                        if (state.audios.isEmpty()) {
+                                                            mainViewModel.onEvent(event = Mp3PlayerEvent.LoadMedias)
+                                                        }
+                                                        sheetState.show()
+                                                    }
                                                 }
-                                                append(text = "  ${state.selectedAudio.songTitle}")
-                                            },
-                                            color = MaterialTheme.colors.onSurface,
-                                            overflow = TextOverflow.Ellipsis,
-                                            style = MaterialTheme.typography.h3
-                                        )
-                                    }
+                                            )
+
+                                        }
+                                    )
                                 },
                                 trailingIcon = {
                                     IconButton(onClick = {
@@ -242,12 +260,11 @@ class MainActivity : ComponentActivity() {
                                         Icon(
                                             painter = painterResource(id = R.drawable.up_right_from_square_solid),
                                             contentDescription = "",
-                                            tint = MaterialTheme.colors.onSurface
+                                            tint = QuaternaryColor
                                         )
                                     }
                                 }
                             )
-
                             Spacer(modifier = Modifier.requiredHeight(height = 16.dp))
 
                             state.selectedAudio.cover?.let {
@@ -285,24 +302,7 @@ class MainActivity : ComponentActivity() {
 
                             Spacer(modifier = Modifier.requiredHeight(height = 16.dp))
 
-                            StackedBarVisualizer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(height = 200.dp)
-                                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                                shape = MaterialTheme.shapes.large,
-                                barCount = 32,
-                                barColors = listOf(
-                                    Color(0xFF1BEBE9),
-                                    Color(0xFF39AFEA),
-                                    Color(0xFF0291D8)
-                                ),
-                                stackBarBackgroundColor = if (isSystemInDarkTheme()) Black3 else
-                                    MaterialTheme.colors.onSurface.copy(alpha = 0.25f),
-                                data = mainViewModel.visualizerData.value
-                            )
 
-                            Spacer(modifier = Modifier.requiredHeight(height = 10.dp))
 
                             TimeBar(
                                 currentPosition = state.currentPosition,
@@ -313,6 +313,33 @@ class MainActivity : ComponentActivity() {
                             )
 
                             Spacer(modifier = Modifier.requiredHeight(height = 10.dp))
+                            Box(modifier = Modifier.fillMaxWidth()) {
+
+                                Box(modifier = Modifier.align(alignment = Alignment.Center)
+                                    .wrapContentSize()
+                                ) {
+                                    if (state.selectedAudio.isNotEmpty()) {
+                                        val artist = if (state.selectedAudio.artist.contains(
+                                                "unknown",
+                                                ignoreCase = true
+                                            )
+                                        ) "" else "${state.selectedAudio.artist} - "
+                                        Text(
+                                            text = buildAnnotatedString {
+                                                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                                                    append(text = artist)
+                                                }
+                                                append(text = "  ${state.selectedAudio.songTitle}")
+                                            },
+                                            color = QuaternaryColor,
+                                            overflow = TextOverflow.Visible,
+                                            style = MaterialTheme.typography.h5
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.requiredHeight(height = 10.dp))
 
                             Row(
                                 modifier = Modifier
@@ -320,6 +347,16 @@ class MainActivity : ComponentActivity() {
                                     .padding(all = 10.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
+                                FastButton(
+                                    enabled = state.currentPosition > FORWARD_BACKWARD_STEP,
+                                    onClick = {
+                                        mainViewModel.onEvent(
+                                            event = Mp3PlayerEvent.Seek(position = state.currentPosition - FORWARD_BACKWARD_STEP.toFloat())
+                                        )
+                                    },
+                                    iconResId = R.drawable.prev_solid,
+                                    stringResId = R.string.lbl_fast_backward
+                                )
                                 FastButton(
                                     enabled = state.currentPosition > FORWARD_BACKWARD_STEP,
                                     onClick = {
@@ -345,6 +382,17 @@ class MainActivity : ComponentActivity() {
                                         )
                                     },
                                     iconResId = R.drawable.forward_solid,
+                                    stringResId = R.string.lbl_fast_forward
+                                )
+                                FastButton(
+                                    enabled = state.currentPosition < (state.selectedAudio.duration - FORWARD_BACKWARD_STEP),
+                                    onClick = {
+                                        //mainViewModel.onEvent(event = Mp3PlayerEvent.Next)
+                                        mainViewModel.onEvent(
+                                            event = Mp3PlayerEvent.Seek(position = state.currentPosition + FORWARD_BACKWARD_STEP.toFloat())
+                                        )
+                                    },
+                                    iconResId = R.drawable.next_solid,
                                     stringResId = R.string.lbl_fast_forward
                                 )
                             }

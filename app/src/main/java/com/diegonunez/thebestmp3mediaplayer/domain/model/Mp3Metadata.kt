@@ -2,6 +2,7 @@ package com.diegonunez.thebestmp3mediaplayer.domain.model
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.provider.MediaStore
 
 data class Mp3Metadata(
     val contentUri: Uri,
@@ -23,4 +24,5 @@ data class Mp3Metadata(
             )
         }
     }
+    fun getMusicUri() : Uri = Uri.withAppendedPath(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, this.contentUri.path)
 }

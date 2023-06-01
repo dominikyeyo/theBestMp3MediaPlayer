@@ -19,6 +19,7 @@ sealed class Mp3PlayerEvent{
     object Play: Mp3PlayerEvent()
 
     object Pause: Mp3PlayerEvent()
+    object Next: Mp3PlayerEvent()
 
     object Stop: Mp3PlayerEvent()
 

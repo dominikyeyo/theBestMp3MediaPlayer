@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.diegonunez.thebestmp3mediaplayer.ui.theme.QuaternaryColor
 import com.diegonunez.thebestmp3mediaplayer.util.milliSecondsToTimeString
 
 @Composable
@@ -27,7 +28,7 @@ fun TimeBar(
         Text(
             text = milliSecondsToTimeString(milliseconds = currentPosition),
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.onSurface
+            color = QuaternaryColor
         )
         Slider(
             modifier = Modifier
@@ -40,7 +41,7 @@ fun TimeBar(
         Text(
             text = milliSecondsToTimeString(milliseconds = duration),
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.onSurface
+            color = QuaternaryColor
         )
     }
 

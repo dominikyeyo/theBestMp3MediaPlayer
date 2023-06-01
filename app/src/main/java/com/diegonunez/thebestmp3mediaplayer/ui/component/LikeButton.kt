@@ -4,6 +4,7 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.diegonunez.thebestmp3mediaplayer.R
 import com.diegonunez.thebestmp3mediaplayer.ui.theme.Pink500
+import com.diegonunez.thebestmp3mediaplayer.ui.theme.QuaternaryColor
 
 @Composable
 fun LikeButton(
@@ -53,7 +55,7 @@ fun LikeButton(
     Icon(
         painter = painterResource(id = if (isLiked) R.drawable.heart_solid else R.drawable.heart_outlined),
         contentDescription = "",
-        tint = if (enabled) Pink500 else MaterialTheme.colors.onSurface,
+        tint = if (enabled) QuaternaryColor else QuaternaryColor,
         modifier = modifier
             .clip(shape = RoundedCornerShape(size = 100.dp))
             .padding(all = 8.dp)

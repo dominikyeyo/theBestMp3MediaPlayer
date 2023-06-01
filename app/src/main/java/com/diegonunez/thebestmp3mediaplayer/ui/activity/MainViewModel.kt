@@ -4,6 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +23,13 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var _state by mutableStateOf(value = Mp3PlayerState())
+
+    private var playList: MutableList<Parcelable>? = null
+    private var currentPosition: Int = 0
+
+    lateinit var musicData: Mp3Metadata
+
+
     val state: Mp3PlayerState
         get() = _state
 
@@ -58,6 +66,7 @@ class MainViewModel @Inject constructor(
 
             Mp3PlayerEvent.Play -> play()
 
+            Mp3PlayerEvent.Next -> next()
 
             Mp3PlayerEvent.Stop -> stop()
 
@@ -126,6 +135,14 @@ class MainViewModel @Inject constructor(
         _player?.pause()
     }
 
+    private fun next() {
+        //if (currentPosition < playList!!.size - 1) { ++currentPosition }
+        //else { currentPosition = 0 }
+        getPositions()
+        _player?.start()    //  getPositions() 멈추는 용도 따로 빼놓음
+        //getCoroutines()
+    }
+
     private fun stop() {
         _visualizerHelper.stop()
         _player?.stop()
@@ -175,5 +192,30 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             repository.likeOrNotSong(id = id)
         }
+    }
+
+    fun getPositions(){
+        _player?.stop()
+        //musicData = playList!!.get(currentPosition) as Mp3Metadata
+        //_player = MediaPlayer.create(,musicData.getMusicUri())
+
+        /*
+        binding.seekBar.progress = 0
+        binding.playDuration.text = "00:00"
+        binding.seekBar.max = mediaPlayer?.duration ?: 0
+        binding.totalDuration.text =
+            SimpleDateFormat("mm:ss").format(musicData.duration)
+        binding.albumTitle.text = musicData.title
+        binding.albumArtist.text = musicData.artist
+        binding.playButton.setImageResource(R.drawable.pause_24)
+        val bitmap = musicData.getAlbumBitmap(this, ALBUM_IMAGE_SIZE)
+        if (bitmap != null) {
+            binding.albumImage.setImageBitmap(bitmap)
+        } else {
+            binding.albumImage.setImageResource(R.drawable.ic_musical)
+        }
+        */
+        _player?.start()
+
     }
 }
